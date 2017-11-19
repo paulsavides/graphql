@@ -1,13 +1,23 @@
 var express = require('express');
-var db = require('sqlite');
+var sqlite = require('sqlite');
 var { migrate } = require('./migrator/migrator');
 var process = require('process');
 
-db.open('data/directory.db');
+sqlite.open('data/directory.db').then(db => {
+    migrate(db, 'migrations');
+
+    // db.get('SELECT value FROM properties WHERE name = \'schema_verion\'').then(res => {
+    //     console.log(res);
+    // })
+    // .catch(err => {
+    //     console.log(err);
+    // });
+});
+//console.log(db.get('SELECT value FROM properties WHERE name = \'schema_verion\''));
 
 console.log(process.cwd());
 
-migrate(db, 'migrations');
+//migrate(db, 'migrations');
 
 var PORT = process.env.PORT || 3000;
 
