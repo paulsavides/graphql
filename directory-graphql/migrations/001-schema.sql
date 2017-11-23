@@ -1,6 +1,6 @@
 CREATE TABLE properties
 (
-    id INTEGER PRIMARY  KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     value TEXT
 );
@@ -9,13 +9,13 @@ INSERT INTO properties (name, value) VALUES ('schema_version', '1');
 
 CREATE TABLE position
 (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     description TEXT
 );
 
 CREATE TABLE building
 (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     address_number INTEGER,
     street TEXT
@@ -23,7 +23,7 @@ CREATE TABLE building
 
 CREATE TABLE person
 (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name TEXT,
     last_name TEXT,
     position_id INTEGER,

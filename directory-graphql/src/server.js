@@ -1,18 +1,21 @@
 var express = require('express');
-var sqlite = require('sqlite');
+var sqlite3 = require('sqlite3').verbose();
 var { migrate } = require('./migrator/migrator');
 var process = require('process');
 
-sqlite.open('data/directory.db').then(db => {
-    migrate(db, 'migrations');
+var db = new sqlite3.Database('data/directory.db');
+migrate(db, 'migrations');
 
-    // db.get('SELECT value FROM properties WHERE name = \'schema_verion\'').then(res => {
-    //     console.log(res);
-    // })
-    // .catch(err => {
-    //     console.log(err);
-    // });
-});
+// sqlite.open('data/directory.db').then(db => {
+//     migrate(db, 'migrations');
+
+//     // db.get('SELECT value FROM properties WHERE name = \'schema_verion\'').then(res => {
+//     //     console.log(res);
+//     // })
+//     // .catch(err => {
+//     //     console.log(err);
+//     // });
+// });
 //console.log(db.get('SELECT value FROM properties WHERE name = \'schema_verion\''));
 
 console.log(process.cwd());
