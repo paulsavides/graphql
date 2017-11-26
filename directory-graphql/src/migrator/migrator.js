@@ -4,8 +4,9 @@ var fs = require('fs')
 module.exports = { migrate: migrate };
 
 function migrate(db, migrationRoot) {
-    
-    getCurSchema(db, migrateToVer);
+    getCurSchema(db, migrateToVer)
+    .then((db, ver) => { migrateToVer(db, ver); })
+    .catch(err => { console.log(err);});
 }
 
 function migrateToVer(db, ver) {
@@ -33,29 +34,36 @@ function migrateToVer(db, ver) {
     });
 }
 
-function getCurSchema(db, next) {
-    db.get('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'properties\'', function(err, res) {
-        if (!(err === undefined || err === null)) {
-            console.log(err);
-            throw err;
-        }
-        
-        if (res === undefined || res === null) {
-            next(db, 0); // initial schema
-            return;
-        }
-
-        db.get('SELECT value FROM properties WHERE name=\'schema_version\'', (err, res) => {
+function getCurSchema(db) {
+    return new Promise((resolve, reject) => {
+        db.get('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'properties\'', function(err, res) {
             if (!(err === undefined || err === null)) {
                 console.log(err);
-                throw err;
+                reject(err);
+                return;
             }
             
             if (res === undefined || res === null) {
-                throw new Error("Something has happened that I don't fully understand.");
+                resolve(db, 0); // initial schema
+                return;
             }
 
-            next(db, res.value);
+            db.get('SELECT value FROM properties WHERE name=\'schema_version\'', (err, res) => {
+                if (!(err === undefined || err === null)) {
+                    console.log(err);
+                    reject(err);
+                    return;
+                }
+                
+                if (res === undefined || res === null) {
+                    throw new Error("Something has happened that I don't fully understand.");
+                }
+
+                console.log("res: " + res);
+                console.log("res.value: " + res.value);
+                resolve(db, res.value);
+                //next(db, res.value);
+            });
         });
     });
 }
