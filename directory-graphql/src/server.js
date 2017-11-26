@@ -1,29 +1,27 @@
 var express = require('express');
-var sqlite3 = require('sqlite3').verbose();
-var { migrate } = require('./migrator/migrator');
 var process = require('process');
+var graphqlHTTP = require('express-graphql');
 
-var db = new sqlite3.Database('data/directory.db');
-migrate(db, 'migrations');
-
-// sqlite.open('data/directory.db').then(db => {
-//     migrate(db, 'migrations');
-
-//     // db.get('SELECT value FROM properties WHERE name = \'schema_verion\'').then(res => {
-//     //     console.log(res);
-//     // })
-//     // .catch(err => {
-//     //     console.log(err);
-//     // });
-// });
-//console.log(db.get('SELECT value FROM properties WHERE name = \'schema_verion\''));
-
-console.log(process.cwd());
-
-//migrate(db, 'migrations');
+var { migrate } = require('./migrator/migrator');
+var { loadSchema } = require('./schema/schemaBuilder');
+var { root } = require('./resolvers/resolvers');
 
 var PORT = process.env.PORT || 3000;
 
 const app = express();
-app.get('/', (req, res) => res.send("Hey"));
-app.listen(PORT, () => console.log("happily running your server on port: " + PORT));
+app.use('/graphql', graphqlHTTP({
+    schema: loadSchema(),
+    rootValue: root,
+    graphiql: true
+}));
+
+var db = require('./data/dbFactory').db();
+
+// make sure the db is ready to go and then run the thing
+migrate(db, 'migrations')
+.then(() => {
+    app.listen(PORT, () => console.log("happily running your server on port: " + PORT));
+})
+.catch(err => {
+    console.log(err);
+});

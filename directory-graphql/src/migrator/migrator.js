@@ -4,33 +4,44 @@ var fs = require('fs')
 module.exports = { migrate: migrate };
 
 function migrate(db, migrationRoot) {
-    getCurSchema(db, migrateToVer)
-    .then((db, ver) => { migrateToVer(db, ver); })
-    .catch(err => { console.log(err);});
+    return new Promise((resolve, reject) => {
+        getCurSchema(db, migrateToVer)
+        .then((db, ver) => {
+            migrateToVer(db, ver, migrationRoot)
+            .then(resolve)
+            .catch(reject)
+        })
+        .catch(reject);
+    });
 }
 
-function migrateToVer(db, ver) {
-    console.log("version: " + ver);
-    var versions = loadSchemaVers("migrations");
+function migrateToVer(db, ver, migrationRoot) {
+    return new Promise((resolve, reject) => {
+        var versions = loadSchemaVers(migrationRoot);
 
-    db.serialize(() => {
-        for (var i = ver; i < versions.length; i++) {
-            var data = fs.readFileSync("migrations" + '\\' + versions[i].fileName, {encoding: 'utf-8'});
+        db.serialize(() => {
+            for (var i = ver; i < versions.length; i++) {
+                var data = fs.readFileSync(migrationRoot + '\\' + versions[i].fileName, {encoding: 'utf-8'});
 
-            // is this good design? No, but it will suffice for this little dude.
-            data.split(';').forEach(stmt => {
-                // don't want to execute an empty string, sqlite does not like that
-                if (stmt.trim().length == 0) {
-                    return;
-                }
-
-                db.run(stmt, (err) => {
-                    if (err !== null) {
-                        console.log('Error doing stuff: ', err);
+                // is this good design? No, but it will suffice for this little dude.
+                data.split(';').forEach(stmt => {
+                    // don't want to execute an empty string, sqlite does not like that
+                    if (stmt.trim().length == 0) {
+                        return;
                     }
-                });                    
-            });
-        }
+
+                    db.run(stmt, (err, res) => {
+                        console.log(res);
+                        if (err !== null) {
+                            reject(err);
+                            return;
+                        }
+                    });                    
+                });
+            }
+        });
+
+        resolve();
     });
 }
 
@@ -56,13 +67,9 @@ function getCurSchema(db) {
                 }
                 
                 if (res === undefined || res === null) {
-                    throw new Error("Something has happened that I don't fully understand.");
+                    reject(new Error("Something has happened that I don't fully understand."));
                 }
-
-                console.log("res: " + res);
-                console.log("res.value: " + res.value);
                 resolve(db, res.value);
-                //next(db, res.value);
             });
         });
     });

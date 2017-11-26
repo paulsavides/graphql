@@ -1,0 +1,27 @@
+input BuildingToCreate {
+    name: String!
+    addressNumber: String!
+    street: String!
+}
+
+
+
+type Mutation {
+  setMessage(message: String): String
+}
+
+type Building {
+    get
+}
+
+type RandomDie {
+  numSides: Int!
+  rollOnce: Int!
+  roll(numRolls: Int!): [Int]
+}
+
+type Query {
+  quoteOfTheDay: String
+  random: Float!
+  getDie(numSides: Int): RandomDie
+}
