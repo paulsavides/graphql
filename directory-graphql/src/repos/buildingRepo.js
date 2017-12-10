@@ -8,11 +8,12 @@ module.exports = {
 
 function getBuilding(buildingId) {
     return new Promise((resolve, reject) => {
-        var sql = 'SELECT id, name, address_number, street FROM building WHERE id = ?';
+        console.log("got here with id: " + buildingId);
+        var sql = 'SELECT id, name, address_number, street FROM building WHERE id = (?)';
         var stmt = db.prepare(sql);
         
-        stmt.run(buildingId, (err, row) => {
-            if (err !== null || err !== undefined) {
+        stmt.get(buildingId, (err, row) => {
+            if (!(err === null || err === undefined)) {
                 reject(err);
                 return;
             }

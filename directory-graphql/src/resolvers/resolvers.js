@@ -1,30 +1,30 @@
-var RandomDie = require('../types/randomDie.js');
+var Building = require('../types/building');
+var buildingRepo = require('../repos/buildingRepo');
 
-function quoteOfTheDay() {
-    return Math.random() < 0.5 ? 'Take it easy' : 'Salvation lies within';    
+function building(args) {
+    return buildingRepo.getBuilding(args.id).then(
+        building => {
+            return new Building(building.id, building);
+        }
+    );
 }
 
-function random() {
-    return Math.random();
-}
-
-function rollDice(args) {
-    var output = [];
-    for (var i = 0; i < args.numDice; i++) {
-      output.push(1 + Math.floor(Math.random() * (args.numSides || 6)));
+function printIt(obj) {
+    if (obj === undefined || obj === null) {
+        console.log("obj is bad stop.");
+        return;
     }
-    return output;
-}
 
-function getDie({numSides}) {
-    return new RandomDie(numSides || 6);
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            console.log("Key: " + key);
+            console.log("obj[key]: " + obj[key]);
+        }
+    }
 }
 
 module.exports  = {
     root: {
-        quoteOfTheDay: quoteOfTheDay,
-        random: random,
-        getDie: getDie
-        
+        building: building
     }
 }
