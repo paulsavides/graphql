@@ -1,4 +1,4 @@
-var db = require('../data/dbFactory').db();
+var dbHelper = require('../data/dbHelper');
 
 module.exports = {
     getBuildings : getBuildings,
@@ -7,66 +7,24 @@ module.exports = {
 }
 
 function getBuilding(buildingId) {
-    return new Promise((resolve, reject) => {
-        var sql = 'SELECT id, name, address_number, street FROM building WHERE id = (?)';
-        var stmt = db.prepare(sql);
-        
-        stmt.get(buildingId, (err, row) => {
-            if (err !== null) {
-                reject(err);
-                return;
-            }
-
-            if (row !== null || row !== undefined) {
-                resolve(mapRow(row));
-                return;
-            }
-
-            reject(new Error("An undefined event occured"));
-        });
-
-        stmt.finalize();
-    });
+    var sql = 'SELECT id, name, address_number, street FROM building WHERE id = (?)';
+    return dbHelper.getById(buildingId, sql, mapRow);
 }
 
 function getBuildings() {
-    return new Promise((resolve, reject) => {
-        var sql = 'SELECT id, name, address_number, street FROM building';
-        
-        db.all(sql, (err, rows) => {
-            if (err !== null) {
-                reject(err);
-                return;
-            }
-
-            if (rows !== null || rows !== undefined) {
-                resolve(rows.map(mapRow));
-                return;
-            }
-
-            reject(new Error("An undefined event occured"));
-        });
-
-    });
+    var sql = 'SELECT id, name, address_number, street FROM building';
+    return dbHelper.getAll(sql, mapRow);
 }
 
 function createBuilding(building) {
-    return new Promise((resolve, reject) => {
-        var sql = 'INSERT INTO building (name, address_number, street) VALUES (?,?,?)';
-        var stmt = db.prepare(sql);
-        
-        stmt.run(building.name, building.addressNumber, building.street, (err, _) => {
-            if (err !== null) {
-                reject(err);
-                return;
-            }
-            
-            resolve(stmt.lastID);
-            return;
-        });
+    var sql = 'INSERT INTO building (name, address_number, street) VALUES (?,?,?)';
+    var params = [
+        building.name,
+        building.addressNumber,
+        building.street
+    ];
 
-        stmt.finalize();
-    });
+    return dbHelper.create(sql, params);
 }
 
 function mapRow(row) {

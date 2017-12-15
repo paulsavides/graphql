@@ -1,4 +1,4 @@
-var db = require('../data/dbFactory').db();
+var dbHelper = require('../data/dbHelper');
 
 module.exports = {
     getPerson: getPerson,
@@ -7,65 +7,26 @@ module.exports = {
 }
 
 function getPerson(personId) {
-    return new Promise((resolve, reject) => {
-        var sql = 'SELECT id, first_name, last_name, building_id, position_id FROM person WHERE id = ?';
-        var stmt = db.prepare(sql);
-
-        stmt.get(personId, (err, row) => {
-            if (err !== null) {
-                reject(err);
-                return;
-            }
-
-            if (row !== undefined) {
-                resolve(mapRow(row))
-                return;
-            }
-
-            reject(new Error('An undefined event occured'));
-        });
-    });
+    var sql = 'SELECT id, first_name, last_name, building_id, position_id FROM person WHERE id = ?';
+    return dbHelper.getById(personId, sql, mapRow);
 }
 
 function getPersons() {
-    return new Promise((resolve, reject) => {
-        var sql = 'SELECT id, first_name, last_name, building_id, position_id FROM person';
-
-        db.all(sql, (err, rows) => {
-            if (err !== null) {
-                reject(err);
-                return;
-            }
-
-            if (rows !== undefined) {
-                resolve(rows.map(mapRow));
-                return;
-            }
-
-            reject(new Error("An undefined event occured"));
-        });
-    })
+    var sql = 'SELECT id, first_name, last_name, building_id, position_id FROM person';
+    return dbHelper.getAll(sql, mapRow);
 }
 
 function createPerson(person) {
-    return new Promise((resolve, reject) => {
-        var sql = 'INSERT INTO person (first_name, last_name, building_id, position_id) VALUES (?,?,?,?)';
-        var stmt = db.prepare(sql);
+    var sql = 'INSERT INTO person (first_name, last_name, building_id, position_id) VALUES (?,?,?,?)';
+    var params = [
+        person.firstName,
+        person.lastName,
+        person.buildingId,
+        person.positionId
+    ];
 
-        stmt.run(person.firstName, person.lastName, person.buildingId, person.positionId, (err, _) => {
-            if (err !== null) {
-                reject(err);
-                return;
-            }
-
-            resolve(stmt.lastID);
-            return;
-        });
-
-        stmt.finalize();
-    });
+    return dbHelper.create(sql, params);
 }
-
 
 function mapRow(row) {
     return {

@@ -7,17 +7,11 @@ var positionRepo = require('../repos/positionRepo');
 var personRepo = require('../repos/personRepo');
 
 function building(args) {
-    return args.id !== undefined ? buildingRepo.getBuilding(args.id).then(
-        building => {
-            var arr = [];
-            arr.push(new Building(building.id, building));
-            return arr;
-        }
-    ) : buildingRepo.getBuildings().then(
-        buildings => {
-            return buildings.map(building => new Building(building.id, building));
-        }
-    );
+    var map = function (input) {
+        return new Building(input.id, input);
+    }
+
+    return runQuery(args, buildingRepo.getBuilding, buildingRepo.getBuildings, map);
 }
 
 function createBuilding({input}) {
@@ -27,17 +21,11 @@ function createBuilding({input}) {
 }
 
 function position(args) {
-    return args.id !== undefined ? positionRepo.getPosition(args.id).then(
-        position => {
-            var arr = [];
-            arr.push(new Position(position.id, position.description));
-            return arr;
-        }
-    ) : positionRepo.getPositions().then(
-        positions => {
-            return positions.map(position => new Position(position.id, position.description));
-        }
-    );
+    var map = function (input) {
+        return new Position(input.id, input.description);
+    }
+
+    return runQuery(args, positionRepo.getPosition, positionRepo.getPositions, map);
 }
 
 function createPosition({input}) {
@@ -47,17 +35,11 @@ function createPosition({input}) {
 }
 
 function person(args) {
-    return args.id !== undefined ? personRepo.getPerson(args.id).then(
-        person => {
-            var arr = [];
-            arr.push(new Person(person.id, person));
-            return arr;
-        }
-    ) : personRepo.getPersons().then(
-        persons => {
-            return persons.map(person => new Person(person.id, person));
-        }
-    );
+    var map = function (input) {
+        return new Person(input.id, input);
+    }
+
+    return runQuery(args, personRepo.getPerson, personRepo.getPersons, map);
 }
 
 function createPerson({input}) {
@@ -66,7 +48,23 @@ function createPerson({input}) {
     });
 }
 
-module.exports  = {
+function runQuery(args, getOne, getAll, toType) {
+    return args.id !== undefined ? getOne(args.id).then(
+        res => {
+            var arr = [];
+            if (res !== undefined) {
+                arr.push(toType(res));
+            }
+            return arr;
+        }
+    ) : getAll().then(
+        res => {
+            return res.map(toType);
+        }
+    );
+}
+
+module.exports = {
     root: {
         building: building,
         createBuilding: createBuilding,
