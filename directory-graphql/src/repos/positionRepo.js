@@ -1,66 +1,63 @@
-var db = require('../data/dbFactory').db();
+var db = require('../data/dbFactory').db()
 
 module.exports = {
-    getBuildings : getBuildings,
-    getBuilding: getBuilding,
-    createBuilding: createBuilding
+    getPosition: getPosition,
+    getPositions: getPositions,
+    createPosition: createPosition
 }
 
-function getBuilding(buildingId) {
+function getPosition(positionId) {
     return new Promise((resolve, reject) => {
-        var sql = 'SELECT id, name, address_number, street FROM building WHERE id = (?)';
+        var sql = 'SELECT id, description FROM position WHERE id = (?)';
         var stmt = db.prepare(sql);
-        
-        stmt.get(buildingId, (err, row) => {
+
+        stmt.get(positionId, (err, row) => {
             if (err !== null) {
                 reject(err);
                 return;
             }
 
-            if (row !== null || row !== undefined) {
+            if (row !== undefined) {
                 resolve(mapRow(row));
                 return;
             }
 
             reject(new Error("An undefined event occured"));
         });
-
-        stmt.finalize();
     });
 }
 
-function getBuildings() {
+function getPositions() {
     return new Promise((resolve, reject) => {
-        var sql = 'SELECT id, name, address_number, street FROM building';
-        
+        var sql = 'SELECT id, description FROM position';
+
         db.all(sql, (err, rows) => {
             if (err !== null) {
                 reject(err);
                 return;
             }
 
-            if (rows !== null || rows !== undefined) {
+            if (rows !== undefined) {
                 resolve(rows.map(mapRow));
                 return;
             }
 
             reject(new Error("An undefined event occured"));
         });
-
     });
 }
 
-function createBuilding(building) {
+function createPosition(description) {
     return new Promise((resolve, reject) => {
-        var sql = 'INSERT INTO building (name, address_number, street) VALUES (?,?,?)';
+        var sql = 'INSERT INTO position (description) VALUES (?)';
         var stmt = db.prepare(sql);
-        
-        stmt.run(building.name, building.addressNumber, building.street, (err, _) => {
+
+        stmt.run(description, (err, _) => {
             if (err !== null) {
                 reject(err);
                 return;
             }
-            
+
             resolve(stmt.lastID);
             return;
         });
@@ -72,8 +69,6 @@ function createBuilding(building) {
 function mapRow(row) {
     return {
         id: row.id,
-        name: row.name,
-        addressNumber: row.address_number,
-        street: row.street
+        description: row.description
     }
 }

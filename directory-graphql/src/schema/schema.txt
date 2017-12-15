@@ -11,10 +11,21 @@ input BuildingToCreate {
   street: String
 }
 
+type Position {
+  id: Int
+  description: String
+}
+
+input PositionToCreate {
+  description: String
+}
+
 type Query {
   building(id: Int): [Building]
+  position(id: Int): [Position]
 }
 
 type Mutation {
   createBuilding(input: BuildingToCreate): Building
+  createPosition(input: PositionToCreate): Position
 }
