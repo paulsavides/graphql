@@ -1,8 +1,10 @@
 var Building = require('../types/building');
 var Position = require('../types/position');
+var Person = require('../types/person');
 
 var buildingRepo = require('../repos/buildingRepo');
 var positionRepo = require('../repos/positionRepo');
+var personRepo = require('../repos/personRepo');
 
 function building(args) {
     return args.id !== undefined ? buildingRepo.getBuilding(args.id).then(
@@ -44,11 +46,33 @@ function createPosition({input}) {
     })
 }
 
+function person(args) {
+    return args.id !== undefined ? personRepo.getPerson(args.id).then(
+        person => {
+            var arr = [];
+            arr.push(new Person(person.id, person));
+            return arr;
+        }
+    ) : personRepo.getPersons().then(
+        persons => {
+            return persons.map(person => new Person(person.id, person));
+        }
+    );
+}
+
+function createPerson({input}) {
+    return personRepo.createPerson(input).then(newId => {
+        return new Person(newId, input);
+    });
+}
+
 module.exports  = {
     root: {
         building: building,
         createBuilding: createBuilding,
         position: position,
-        createPosition: createPosition
+        createPosition: createPosition,
+        person: person,
+        createPerson: createPerson
     }
 }

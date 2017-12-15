@@ -20,12 +20,29 @@ input PositionToCreate {
   description: String
 }
 
+type Person {
+  id: Int
+  firstName: String
+  lastName: String
+  buildingId: Int
+  positionId: Int
+}
+
+input PersonToCreate {
+  firstName: String
+  lastName: String
+  buildingId: Int
+  positionId: Int
+}
+
 type Query {
   building(id: Int): [Building]
   position(id: Int): [Position]
+  person(id: Int): [Person]
 }
 
 type Mutation {
   createBuilding(input: BuildingToCreate): Building
   createPosition(input: PositionToCreate): Position
+  createPerson(input: PersonToCreate): Person
 }
