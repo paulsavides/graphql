@@ -35,7 +35,7 @@ function getBuildings() {
         var sql = 'SELECT id, name, address_number, street FROM building';
         
         db.all(sql, (err, rows) => {
-            if (err !== null || err !== undefined) {
+            if (!(err !== null || err !== undefined)) {
                 reject(err);
                 return;
             }

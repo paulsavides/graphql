@@ -6,5 +6,5 @@ type Building {
 }
 
 type Query {
-  building(id: Int!): Building
+  building(id: Int): [Building]
 }
