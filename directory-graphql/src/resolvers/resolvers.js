@@ -15,22 +15,15 @@ function building(args) {
     );
 }
 
-// function printIt(obj) {
-//     if (obj === undefined || obj === null) {
-//         console.log("obj is bad stop.");
-//         return;
-//     }
-
-//     for (var key in obj) {
-//         if (obj.hasOwnProperty(key)) {
-//             console.log("Key: " + key);
-//             console.log("obj[key]: " + obj[key]);
-//         }
-//     }
-// }
+function createBuilding({input}) {
+    return buildingRepo.createBuilding(input).then(newId => {
+        return new Building(newId, input);
+    })
+}
 
 module.exports  = {
     root: {
-        building: building
+        building: building,
+        createBuilding: createBuilding
     }
 }

@@ -57,11 +57,11 @@ function createBuilding(building) {
         var stmt = db.prepare(sql);
         
         stmt.run(building.name, building.addressNumber, building.street, (err, _) => {
-            if (err !== null || err !== undefined) {
+            if (!(err !== null || err !== undefined)) {
                 reject(err);
                 return;
             }
-            resolve();
+            resolve(stmt.lastID);
             return;
         });
 

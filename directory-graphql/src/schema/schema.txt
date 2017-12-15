@@ -5,6 +5,16 @@ type Building {
     street: String
 }
 
+input BuildingToCreate {
+  name: String
+  addressNumber: String
+  street: String
+}
+
 type Query {
   building(id: Int): [Building]
+}
+
+type Mutation {
+  createBuilding(input: BuildingToCreate): Building
 }
