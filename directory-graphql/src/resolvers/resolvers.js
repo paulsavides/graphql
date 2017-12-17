@@ -42,6 +42,16 @@ function person(parent, args) {
     return runQuery(args, personRepo.getPerson, personRepo.getPersons, map);
 }
 
+function personsByBuildingId(parent, args) {
+    var map = function (input) {
+        return new Person(input.id, input);
+    }
+
+    return personRepo.getPersonsByBuildingId(args.id).then((persons) => {
+        return persons.map(map);
+    });
+}
+
 function createPerson(parent, {input}) {
     return personRepo.createPerson(input).then(newId => {
         return new Person(newId, input);
@@ -85,6 +95,13 @@ module.exports = {
             return position(parent, {id: parent.positionId}).then(position => {
                 return position;
             });
+        }
+    },
+    Building: {
+        persons: (parent) => {
+            return personsByBuildingId(parent, {id: parent.id}).then(persons => {
+                return persons;
+            })
         }
     }
 }

@@ -3,6 +3,7 @@ type Building {
     name: String
     addressNumber: String
     street: String
+    persons: [Person]
 }
 
 input BuildingToCreate {
@@ -26,8 +27,8 @@ type Person {
   lastName: String
   buildingId: Int
   positionId: Int
-  building: Building
-  position: Position
+  building: [Building]
+  position: [Position]
 }
 
 input PersonToCreate {

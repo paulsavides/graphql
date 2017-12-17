@@ -3,6 +3,7 @@ var dbHelper = require('../data/dbHelper');
 module.exports = {
     getPerson: getPerson,
     getPersons: getPersons,
+    getPersonsByBuildingId: getPersonsByBuildingId,
     createPerson: createPerson
 }
 
@@ -14,6 +15,11 @@ function getPerson(personId) {
 function getPersons() {
     var sql = 'SELECT id, first_name, last_name, building_id, position_id FROM person';
     return dbHelper.getAll(sql, mapRow);
+}
+
+function getPersonsByBuildingId(buildingId) {
+    var sql = 'SELECT id, first_name, last_name, building_id, position_id FROM person WHERE building_id = ?';
+    return dbHelper.getAllById(buildingId, sql, mapRow);
 }
 
 function createPerson(person) {

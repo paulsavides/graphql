@@ -61,6 +61,39 @@ function getAll(sql, mapRow) {
 }
 
 /**
+ * Will run the given SELECT query as a prepared statement using the given
+ * numeric id as a parameter. Will return an array of mapped objects
+ * 
+ * @param {number} id id of a related entity
+ * @param {string} sql sql to run
+ * @param {Function} mapRow function to map returned row from db to an anonymous object
+ * @returns {Promise<Array<any>>} promise returns an array of mapped objects
+ */
+function getAllById(id, sql, mapRow) {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            var stmt = db.prepare(sql);
+            
+            stmt.all(id, (err, rows) => {
+                if (err !== null) {
+                    reject(err);
+                    return;
+                }
+    
+                if (rows !== undefined) {
+                    resolve(rows.map(mapRow));
+                    return;
+                }
+    
+                resolve([]);
+            });
+
+            stmt.finalize();
+        });
+    });
+}
+
+/**
  * Runs given sql as a prepared statement with the given params and returns
  * a promise with the newly inserted id.
  * 
@@ -91,5 +124,6 @@ function create(sql, params) {
 module.exports = {
     getById: getById,
     getAll: getAll,
+    getAllById: getAllById,
     create: create
 }
