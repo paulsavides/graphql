@@ -6,7 +6,7 @@ var buildingRepo = require('../repos/buildingRepo');
 var positionRepo = require('../repos/positionRepo');
 var personRepo = require('../repos/personRepo');
 
-function building(args) {
+function building(parent, args) {
     var map = function (input) {
         return new Building(input.id, input);
     }
@@ -14,13 +14,13 @@ function building(args) {
     return runQuery(args, buildingRepo.getBuilding, buildingRepo.getBuildings, map);
 }
 
-function createBuilding({input}) {
+function createBuilding(parent, {input}) {
     return buildingRepo.createBuilding(input).then(newId => {
         return new Building(newId, input);
     })
 }
 
-function position(args) {
+function position(parent, args) {
     var map = function (input) {
         return new Position(input.id, input.description);
     }
@@ -28,7 +28,7 @@ function position(args) {
     return runQuery(args, positionRepo.getPosition, positionRepo.getPositions, map);
 }
 
-function createPosition({input}) {
+function createPosition(parent, {input}) {
     return positionRepo.createPosition(input.description).then(newId => {
         return new Position(newId, input.description);
     })
@@ -42,7 +42,7 @@ function person(parent, args) {
     return runQuery(args, personRepo.getPerson, personRepo.getPersons, map);
 }
 
-function createPerson({input}) {
+function createPerson(parent, {input}) {
     return personRepo.createPerson(input).then(newId => {
         return new Person(newId, input);
     });
@@ -56,7 +56,7 @@ function runQuery(args, getOne, getAll, toType) {
                 arr.push(toType(res));
             }
             return arr;
-        }
+        }   
     ) : getAll().then(
         res => {
             return res.map(toType);
@@ -74,5 +74,17 @@ module.exports = {
         createBuilding: createBuilding,
         createPosition: createPosition,
         createPerson: createPerson        
+    },
+    Person: {
+        building: (parent) => {
+            return building(parent, {id: parent.buildingId}).then(building => {
+                return building;
+            });
+        },
+        position: (parent) => {
+            return position(parent, {id: parent.positionId}).then(position => {
+                return position;
+            });
+        }
     }
 }

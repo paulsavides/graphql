@@ -26,6 +26,8 @@ type Person {
   lastName: String
   buildingId: Int
   positionId: Int
+  building: Building
+  position: Position
 }
 
 input PersonToCreate {
