@@ -4,14 +4,12 @@ var graphqlHTTP = require('express-graphql');
 
 var { migrate } = require('./migrator/migrator');
 var { loadSchema } = require('./schema/schemaBuilder');
-var { root } = require('./resolvers/resolvers');
 
 var PORT = process.env.PORT || 3000;
 
 const app = express();
 app.use('/graphql', graphqlHTTP({
     schema: loadSchema(),
-    rootValue: root,
     graphiql: true
 }));
 

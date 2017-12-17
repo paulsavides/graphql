@@ -1,13 +1,13 @@
 var fs = require ('fs');
-var { buildSchema } = require('graphql');
+var { makeExecutableSchema } = require('graphql-tools')
+var resolvers = require('../resolvers/resolvers')
 
 function loadSchema() {
     var filename = 'src/schema/schema.txt';
     
-    var data = fs.readFileSync(filename, 'utf8');
-    return buildSchema(data);
+    var typeDefs = fs.readFileSync(filename, 'utf8');
+    return makeExecutableSchema({typeDefs, resolvers});
 }
-
 
 module.exports = {
     loadSchema: loadSchema

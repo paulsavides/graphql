@@ -34,7 +34,7 @@ function createPosition({input}) {
     })
 }
 
-function person(args) {
+function person(parent, args) {
     var map = function (input) {
         return new Person(input.id, input);
     }
@@ -49,7 +49,7 @@ function createPerson({input}) {
 }
 
 function runQuery(args, getOne, getAll, toType) {
-    return args.id !== undefined ? getOne(args.id).then(
+    return (args !== undefined && args.id !== undefined) ? getOne(args.id).then(
         res => {
             var arr = [];
             if (res !== undefined) {
@@ -65,12 +65,14 @@ function runQuery(args, getOne, getAll, toType) {
 }
 
 module.exports = {
-    root: {
+    Query: {
         building: building,
-        createBuilding: createBuilding,
         position: position,
+        person: person
+    },
+    Mutation: {
+        createBuilding: createBuilding,
         createPosition: createPosition,
-        person: person,
-        createPerson: createPerson
+        createPerson: createPerson        
     }
 }
